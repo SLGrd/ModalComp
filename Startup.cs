@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -20,8 +21,9 @@ namespace ModalComp
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
-
-            ApiKeyCrd = (Configuration.GetSection("Apikey").GetChildren().FirstOrDefault(config => config.Key == "Valor1").Value, "text/plain").Value;
+            // Get from settings file the Key that will grant access to CheckAPI functionalities
+            //ApiKeyId    = (Configuration.GetSection("ApiKey").GetChildren().FirstOrDefault(config => config.Key == "Id").Value,    "text/plain").Value;
+            //ApiKeyValue = (Configuration.GetSection("ApiKey").GetChildren().FirstOrDefault(config => config.Key == "Value").Value, "text/plain").Value;
         }
 
         // This method gets called by the runtime. Use this method to add services to the container.
@@ -29,8 +31,7 @@ namespace ModalComp
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddRazorPages();
-            services.AddServerSideBlazor();
-            services.AddSingleton<WeatherForecastService>();
+            services.AddServerSideBlazor();            
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -44,13 +45,28 @@ namespace ModalComp
             {
                 app.UseExceptionHandler("/Error");
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-                app.UseHsts();
+                app.UseHsts();                
             }
+
+            //  How to display static files
+            //DefaultFilesOptions dfo = new DefaultFilesOptions();
+            //dfo.DefaultFileNames.Clear();
+            //dfo.DefaultFileNames.Add("Default.html");
+            //app.UseDefaultFiles(dfo);
+            //app.UseStaticFiles();  
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
 
             app.UseRouting();
+
+            //app.UseCors(x => x
+            //    .AllowAnyOrigin()
+            //    .AllowAnyMethod()
+            //    .AllowAnyHeader());
+
+            app.UseAuthentication();
+            app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {
